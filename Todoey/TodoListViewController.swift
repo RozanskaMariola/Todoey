@@ -8,27 +8,27 @@
 
 import UIKit
 
-class TodoListViewController: UITableViewController{
-
-    let defaults = UserDefaults.standard
+class TodoListViewController: UITableViewController {
     
-    var itemArray = ["Find Mike","Buy Eggos","Destory Demogorgon"]
+    var itemArray = ["Find Mike", "Buy eggos", "Destory demogorgon"]
+    
+    let defaults = UserDefaults.standard
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+        if let items = UserDefaults.standard.array(forKey: "itemArray") as? [String] {
             itemArray = items
         }
+        
     }
-
+    
     //MARK - Tableview Datasource Methods
-    //ile wierszy
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return itemArray.count
     }
-
-    //tworzy zawartosc komórki
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
@@ -39,26 +39,24 @@ class TodoListViewController: UITableViewController{
     }
     
     //MARK - TableView Delegate Methods
-    //wykonuje sie po zaznaczeniu wiersza
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        print(itemArray[indexPath.row])
-        
-        //po zaznaczeniu (kliknieciu)
-        //tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-        }else{
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        if let cell = tableView.cellForRow(at: indexPath) {
+            
+            if cell.accessoryType == .checkmark {
+                cell.accessoryType = .none
+            } else {
+                cell.accessoryType = .checkmark
+            }
+            
         }
         
-        //migniecie zaznaczonej komorki - zaznaczenie tylko w momencie kliku - nie swieci caly czas ze zaznaczona
         tableView.deselectRow(at: indexPath, animated: true)
-    
+        
     }
     
-  //  MARK - Add New Items
+    //MARK - Add New Items
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
@@ -69,18 +67,18 @@ class TodoListViewController: UITableViewController{
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             //what will happen once the user clicks the Add Item button on our UIAlert
             
-            self.itemArray.append(textField.text ?? "New Item")
-
-            self.defaults.setValue(self.itemArray, forKey: "TodoListArray")
+            let newItem = textField.text!
+            self.itemArray.append(newItem)
             
+            UserDefaults.standard.set(self.itemArray, forKey: "itemArray")
             self.tableView.reloadData()
         }
         
-        
-        alert.addTextField(configurationHandler: { (alertTextField) in
+        alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create new item"
             textField = alertTextField
-        })
+            
+        }
         
         alert.addAction(action)
         
